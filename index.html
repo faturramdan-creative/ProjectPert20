@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bonus Pembelian</title>
+    <style>
+        /* CSS Sederhana */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-hitung {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-hitung:hover {
+            background-color: #218838;
+        }
+        .btn-reset {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #c82333;
+        }
+        /* Style untuk Output Card */
+        .card {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            background-color: #e0f7fa;
+            display: none; /* Disembunyikan secara default */
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #00838f;
+            border-bottom: 2px solid #00acc1;
+            padding-bottom: 10px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .result-item.total {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #d32f2f;
+            border-top: 1px dashed #00acc1;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Form Pembelian</h2>
+    
+    <form id="formBelanja">
+        <div class="form-group">
+            <label for="namaPelanggan">Nama Pelanggan</label>
+            <input type="text" id="namaPelanggan" placeholder="Masukkan nama pelanggan">
+        </div>
+        <div class="form-group">
+            <label for="namaProduk">Nama Produk</label>
+            <input type="text" id="namaProduk" placeholder="Masukkan nama produk">
+        </div>
+        <div class="form-group">
+            <label for="hargaProduk">Harga Produk (Rp)</label>
+            <input type="number" id="hargaProduk" min="0" placeholder="Contoh: 150000">
+        </div>
+        <div class="form-group">
+            <label for="jumlahPembelian">Jumlah Pembelian</label>
+            <input type="number" id="jumlahPembelian" min="1" placeholder="Contoh: 3">
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-hitung" onclick="hitungTotal()">Hitung</button>
+            <button type="reset" class="btn-reset" onclick="resetHasil()">Reset</button>
+        </div>
+    </form>
+
+    <div id="hasilCard" class="card">
+        <h3>Rincian Pembayaran</h3>
+        <div class="result-item">
+            <span>Nama Pelanggan:</span>
+            <span id="outNamaPelanggan">-</span>
+        </div>
+        <div class="result-item">
+            <span>Nama Produk:</span>
+            <span id="outNamaProduk">-</span>
+        </div>
+        <div class="result-item">
+            <span>Total Belanja:</span>
+            <span id="outTotalBelanja">Rp 0</span>
+        </div>
+        <div class="result-item">
+            <span>Potongan (Bonus):</span>
+            <span id="outPotongan">Rp 0</span>
+        </div>
+        <div class="result-item total">
+            <span>Total Bayar:</span>
+            <span id="outTotalBayar">Rp 0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk memformat angka menjadi format Rupiah
+    function formatRupiah(angka) {
+        return 'Rp ' + angka.toLocaleString('id-ID');
+    }
+
+    // Fungsi Utama Perhitungan
+    function hitungTotal() {
+        // Mengambil nilai dari input form
+        const namaPelanggan = document.getElementById('namaPelanggan').value.trim();
+        const namaProduk = document.getElementById('namaProduk').value.trim();
+        const hargaProduk = document.getElementById('hargaProduk').value;
+        const jumlahPembelian = document.getElementById('jumlahPembelian').value;
+
+        // Validasi Data
+        if (namaPelanggan === "" || namaProduk === "" || hargaProduk === "" || jumlahPembelian === "") {
+            alert("Peringatan: Semua kolom input wajib diisi!");
+            return; // Menghentikan proses jika ada yang kosong
+        }
+
+        // Harga dan Jumlah
+        const harga = parseFloat(hargaProduk);
+        const jumlah = parseInt(jumlahPembelian);
+
+        if (isNaN(harga) || isNaN(jumlah) || harga < 0 || jumlah <= 0) {
+            alert("Peringatan: Harga Produk dan Jumlah Pembelian harus berupa angka yang valid!");
+            return;
+        }
+
+        // Hitung Total Belanja
+        const totalBelanja = harga * jumlah;
+
+        // Bonus Potongan
+        let potongan = 0;
+        if (totalBelanja >= 400000) {
+            potongan = 50000;
+        }
+
+        // Hitung Total Bayar
+        const totalBayar = totalBelanja - potongan;
+
+        // Manipulasi DOM: Menampilkan hasil ke dalam Card Output
+        document.getElementById('outNamaPelanggan').innerText = namaPelanggan;
+        document.getElementById('outNamaProduk').innerText = namaProduk;
+        document.getElementById('outTotalBelanja').innerText = formatRupiah(totalBelanja);
+        document.getElementById('outPotongan').innerText = formatRupiah(potongan);
+        document.getElementById('outTotalBayar').innerText = formatRupiah(totalBayar);
+
+        // Menampilkan card hasil yang sebelumnya disembunyikan
+        document.getElementById('hasilCard').style.display = 'block';
+    }
+
+    // Fungsi sembunyikan card saat tombol Reset ditekan
+    function resetHasil() {
+        document.getElementById('hasilCard').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
